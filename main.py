@@ -12,7 +12,7 @@ class Config:
 bq = bigquery.Client()
 binance = Client(api_key=Config.binance_api_key, api_secret=Config.binance_api_secret)
 
-def execute(request):
+def execute(request, context):
     start_timestamp = datetime.timestamp(datetime.now().replace(minute=0, second=0) - timedelta(hours = 1))
 
     watch_list_table = bq.get_table(table=Config.watch_list_table)
