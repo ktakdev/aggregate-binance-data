@@ -3,18 +3,19 @@ from datetime import datetime, timedelta
 from google.cloud import bigquery
 from binance import Client
 
-BINANCE_API_KEY = os.environ.get("BINANCE_API_KEY")
-BINANCE_API_SECRET = os.environ.get("BINANCE_API_SECRET")
-WATCH_LIST_TABLE = os.environ.get("BIGQUERY_WATCH_LIST_TABLE")
-OUTPUT_TABLE = os.environ.get("BIGQUERY_OUTPUT_TABLE")
+class Config:
+    binance_api_key = os.environ.get("BINANCE_API_KEY")
+    binance_api_secret = os.environ.get("BINANCE_API_SECRET")
+    watch_list_table = os.environ.get("BIGQUERY_WATCH_LIST_TABLE")
+    output_table = os.environ.get("BIGQUERY_OUTPUT_TABLE")
 
 bq = bigquery.Client()
-binance = Client(api_key=BINANCE_API_KEY, api_secret=BINANCE_API_SECRET)
+binance = Client(api_key=Config.binance_api_key, api_secret=Config.binance_api_secret)
 
 def execute(request):
     start_timestamp = datetime.timestamp(datetime.now().replace(minute=0, second=0) - timedelta(hours = 1))
 
-    watch_list_table = bq.get_table(table="binance.watch_list")
+    watch_list_table = bq.get_table(table=Config.watch_list_table)
     watch_list = bq.list_rows(watch_list_table)
     result_rows = []
     for watch_list_item in watch_list:
@@ -24,7 +25,7 @@ def execute(request):
         result_rows.append(row)
         print(row)
 
-    result_table = bq.get_table(table="binance.asset_info")
+    result_table = bq.get_table(table=Config.output_table)
     error = bq.insert_rows(table=result_table, rows=result_rows)
     if error:
         print(error)

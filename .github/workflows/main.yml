@@ -1,0 +1,27 @@
+name: Deploy to Google Cloud Functions
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup GCloud
+        uses: google-github-actions/setup-gcloud@master
+        with:
+          project_id: ${{ secrets.GCP_PROJECT }}
+          credentials_json: "${{ secrets.GCP_CREDENTIALS }}"
+      - name: Deploy Cloud Functions
+        uses: google-github-actions/deploy-cloud-functions@main
+        with:
+          name: aggregate-binance-data
+          description: aggregate price data from binance
+          region: asia-northeast1
+          entry_point: execute
+          runtime: python310
+          event_trigger_type: providers/cloud.pubsub/eventTypes/topic.publish
+          event_trigger_resource: projects/${{ secrets.GCP_PROJECT }}/topics/aggregate-crypto-data
