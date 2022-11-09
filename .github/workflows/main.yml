@@ -9,14 +9,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Setup GCloud
-        uses: google-github-actions/setup-gcloud@master
+      - uses: actions/checkout@v3
+      - name: GCloud Auth
+        uses: google-github-actions/auth@v0
         with:
           project_id: ${{ secrets.GCP_PROJECT }}
           credentials_json: "${{ secrets.GCP_CREDENTIALS }}"
       - name: Deploy Cloud Functions
-        uses: google-github-actions/deploy-cloud-functions@main
+        uses: google-github-actions/deploy-cloud-functions@v0
         with:
           name: aggregate-binance-data
           description: aggregate price data from binance
