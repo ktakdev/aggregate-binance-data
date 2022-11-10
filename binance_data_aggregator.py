@@ -23,7 +23,8 @@ class BinanceDataAggregator:
         for key in dict:
             base_assets = dict[key]
             if "USDT" in base_assets and "BTC" in base_assets:
-                result.append((key, "USDT"), (key, "BTC"))
+                result.append((key, "USDT"))
+                result.append((key, "BTC"))
         return result
 
     def get_historical_kline(
