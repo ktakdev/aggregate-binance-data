@@ -6,8 +6,7 @@ on:
       - main
 
 env:
-  WATCH_LIST_TABLE: binance.watch_list
-  OUTPUT_TABLE: binance.asset_info
+  OUTPUT_TABLE: binance.historical_klines
 
 jobs:
   build:
@@ -29,5 +28,5 @@ jobs:
           runtime: python310
           event_trigger_type: providers/cloud.pubsub/eventTypes/topic.publish
           event_trigger_resource: projects/${{ secrets.GCP_PROJECT }}/topics/aggregate-crypto-data
-          env_vars: "BIGQUERY_WATCH_LIST_TABLE=${{ env.WATCH_LIST_TABLE }},BIGQUERY_OUTPUT_TABLE=${{ env.OUTPUT_TABLE }}"
+          env_vars: "BIGQUERY_OUTPUT_TABLE=${{ env.OUTPUT_TABLE }}"
           secret_environment_variables: "BINANCE_API_KEY=projects/${{ secrets.GCP_PROJECT }}/secrets/binance-api-key,BINANCE_API_SECRET=projects/${{ secrets.GCP_PROJECT }}/secrets/binance-api-secret"
