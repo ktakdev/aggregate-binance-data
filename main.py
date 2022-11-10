@@ -21,10 +21,9 @@ aggregator = BinanceDataAggregator(binance)
 def execute(request, context):
     start_time = datetime.now().replace(minute=0, second=0) - timedelta(hours=1)
 
-    watch_list = aggregator.get_watchlist()
+    watchlist = aggregator.get_watchlist()
     result_rows = []
-    for watch_list_item in watch_list:
-        (base_asset, quote_asset) = watch_list_item.values()
+    for (base_asset, quote_asset) in watchlist:
         row = aggregator.aggregate(base_asset, quote_asset, start_time)
 
         result_rows.append(row)
