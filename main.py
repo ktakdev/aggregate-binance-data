@@ -21,11 +21,14 @@ aggregator = BinanceDataAggregator(binance)
 def execute(request, context):
     watchlist = aggregator.get_watchlist()
     result_rows = []
+    dt = datetime.now()
     for (base_asset, quote_asset) in watchlist:
-        row = aggregator.get_historical_kline(base_asset, quote_asset, datetime.now())
-
-        result_rows.append(row)
-        print(row)
+        try:
+            row = aggregator.get_historical_kline(base_asset, quote_asset, dt)
+            result_rows.append(row)
+            print(row)
+        except Exception:
+            print(f"error occured, skip {base_asset}/{quote_asset}")
 
     result_table = bq.get_table(table=Config.output_table)
     error = bq.insert_rows(table=result_table, rows=result_rows)
