@@ -1,5 +1,5 @@
 import os
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from binance import Client
 from google.cloud import bigquery
@@ -19,12 +19,10 @@ aggregator = BinanceDataAggregator(binance)
 
 
 def execute(request, context):
-    start_time = datetime.now().replace(minute=0, second=0) - timedelta(hours=1)
-
     watchlist = aggregator.get_watchlist()
     result_rows = []
     for (base_asset, quote_asset) in watchlist:
-        row = aggregator.get_historical_kline(base_asset, quote_asset, start_time)
+        row = aggregator.get_historical_kline(base_asset, quote_asset, datetime.now())
 
         result_rows.append(row)
         print(row)

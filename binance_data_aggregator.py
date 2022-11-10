@@ -28,11 +28,13 @@ class BinanceDataAggregator:
         return result
 
     def get_historical_kline(
-        self, base_asset: str, quote_asset: str, open_time: datetime
+        self, base_asset: str, quote_asset: str, time: datetime
     ) -> dict:
         symbol = base_asset + quote_asset
-        start_timestamp = datetime.timestamp(open_time)
-        end_timestamp = datetime.timestamp(open_time + timedelta(hours=1))
+
+        end_time = time.replace(minute=0, second=0, microsecond=0)
+        start_timestamp = datetime.timestamp(end_time - timedelta(hours=1))
+        end_timestamp = datetime.timestamp(end_time)
 
         klines = self.binance_client.get_historical_klines(
             symbol=symbol,
