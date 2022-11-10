@@ -24,7 +24,7 @@ def execute(request, context):
     watchlist = aggregator.get_watchlist()
     result_rows = []
     for (base_asset, quote_asset) in watchlist:
-        row = aggregator.aggregate(base_asset, quote_asset, start_time)
+        row = aggregator.get_historical_kline(base_asset, quote_asset, start_time)
 
         result_rows.append(row)
         print(row)
