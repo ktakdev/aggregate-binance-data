@@ -10,21 +10,15 @@ class BinanceDataAggregator:
     def get_watchlist(self) -> list[tuple[str, str]]:
         res = self.binance_client.get_exchange_info()
         symbols = res["symbols"]
-        dict = {}
 
+        result = []
         for s in symbols:
+            status = s["status"]
             base_asset = s["baseAsset"]
             quote_asset = s["quoteAsset"]
-            if base_asset not in dict:
-                dict[base_asset] = []
-            dict[base_asset].append(quote_asset)
+            if status == "TRADING" and (quote_asset == "BTC" or quote_asset == "USDT"):
+                result.append({"base_asset": base_asset, "quote_asset": quote_asset})
 
-        result = [("BTC", "USDT")]
-        for key in dict:
-            base_assets = dict[key]
-            if "USDT" in base_assets and "BTC" in base_assets:
-                result.append((key, "USDT"))
-                result.append((key, "BTC"))
         return result
 
     def get_historical_kline(
