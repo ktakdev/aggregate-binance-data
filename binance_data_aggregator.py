@@ -28,12 +28,12 @@ class BinanceDataAggregator:
         for base_asset in dict:
             avaiable_quote_assets = dict[base_asset]
             if "BTC" in avaiable_quote_assets:
-                result.append(base_asset, "BTC")
+                result.append((base_asset, "BTC"))
 
             if "USDT" in avaiable_quote_assets:
-                result.append(base_asset, "USDT")
+                result.append((base_asset, "USDT"))
             elif "BUSD" in avaiable_quote_assets:
-                result.append(base_asset, "BUSD")
+                result.append((base_asset, "BUSD"))
 
         return result
 
