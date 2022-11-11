@@ -32,6 +32,8 @@ class BinanceDataAggregator:
 
             if "USDT" in avaiable_quote_assets:
                 result.append(base_asset, "USDT")
+            elif "BUSD" in avaiable_quote_assets:
+                result.append(base_asset, "BUSD")
 
         return result
 
