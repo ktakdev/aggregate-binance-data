@@ -26,6 +26,7 @@ jobs:
           region: asia-northeast1
           entry_point: execute
           runtime: python310
+          timeout: 540
           event_trigger_type: providers/cloud.pubsub/eventTypes/topic.publish
           event_trigger_resource: projects/${{ secrets.GCP_PROJECT }}/topics/aggregate-crypto-data
           env_vars: "BIGQUERY_OUTPUT_TABLE=${{ env.OUTPUT_TABLE }}"
