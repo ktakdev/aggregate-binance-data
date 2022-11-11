@@ -11,13 +11,27 @@ class BinanceDataAggregator:
         res = self.binance_client.get_exchange_info()
         symbols = res["symbols"]
 
-        result = []
+        dict = {}
         for s in symbols:
             status = s["status"]
+            if status != "TRADING":
+                continue
+
             base_asset = s["baseAsset"]
             quote_asset = s["quoteAsset"]
-            if status == "TRADING" and (quote_asset == "BTC" or quote_asset == "USDT"):
-                result.append({"base_asset": base_asset, "quote_asset": quote_asset})
+            if base_asset not in dict:
+                dict[base_asset] = []
+
+            dict[base_asset].append(quote_asset)
+
+        result = []
+        for base_asset in dict:
+            avaiable_quote_assets = dict[base_asset]
+            if "BTC" in avaiable_quote_assets:
+                result.append(base_asset, "BTC")
+
+            if "USDT" in avaiable_quote_assets:
+                result.append(base_asset, "USDT")
 
         return result
 
