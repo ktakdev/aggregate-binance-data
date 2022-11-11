@@ -1,4 +1,5 @@
 import os
+import time
 from datetime import datetime
 
 from binance import Client
@@ -29,6 +30,7 @@ def execute(request, context):
             print(row)
         except Exception:
             print(f"error occured, skip {base_asset}/{quote_asset}")
+        time.sleep(2)
 
     result_table = bq.get_table(table=Config.output_table)
     error = bq.insert_rows(table=result_table, rows=result_rows)
