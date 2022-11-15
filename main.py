@@ -1,5 +1,4 @@
 import os
-import time
 from datetime import datetime
 
 from binance import Client
@@ -20,17 +19,8 @@ aggregator = BinanceDataAggregator(binance)
 
 
 def execute(request, context):
-    watchlist = aggregator.get_watchlist()
-    result_rows = []
     dt = datetime.now()
-    for (base_asset, quote_asset) in watchlist:
-        try:
-            row = aggregator.get_historical_kline(base_asset, quote_asset, dt)
-            result_rows.append(row)
-            print(row)
-        except Exception:
-            print(f"error occured, skip {base_asset}/{quote_asset}")
-        time.sleep(0.5)
+    result_rows = aggregator.aggregate_hourly_data(dt)
 
     result_table = bq.get_table(table=Config.output_table)
     error = bq.insert_rows(table=result_table, rows=result_rows)

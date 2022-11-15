@@ -1,3 +1,4 @@
+import time
 from datetime import datetime, timedelta
 
 from binance import Client
@@ -6,6 +7,19 @@ from binance import Client
 class BinanceDataAggregator:
     def __init__(self, binance_client: Client):
         self.binance_client = binance_client
+
+    def aggregate_hourly_data(self, datetime: datetime):
+        watchlist = self.get_watchlist()
+        result_rows = []
+        for (base_asset, quote_asset) in watchlist:
+            try:
+                row = self.get_historical_kline(base_asset, quote_asset, datetime)
+                result_rows.append(row)
+                print(row)
+            except Exception:
+                print(f"error occured, skip {base_asset}/{quote_asset}")
+            time.sleep(0.5)
+        return result_rows
 
     def get_watchlist(self) -> list[tuple[str, str]]:
         res = self.binance_client.get_exchange_info()
