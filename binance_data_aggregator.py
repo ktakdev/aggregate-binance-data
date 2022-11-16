@@ -3,19 +3,21 @@ from datetime import datetime, timedelta
 
 from binance import Client
 
+from data import Kline
+
 
 class BinanceDataAggregator:
     def __init__(self, binance_client: Client):
         self.binance_client = binance_client
 
-    def aggregate_hourly_data(self, datetime: datetime):
+    def aggregate_hourly_data(self, datetime: datetime) -> list[Kline]:
         watchlist = self.get_watchlist()
         result_rows = []
         for (base_asset, quote_asset) in watchlist:
             try:
                 row = self.get_historical_kline(base_asset, quote_asset, datetime)
                 result_rows.append(row)
-                print(row)
+                print(row.to_dict())
             except Exception:
                 print(f"error occured, skip {base_asset}/{quote_asset}")
             time.sleep(0.5)
@@ -56,11 +58,10 @@ class BinanceDataAggregator:
         return result
 
     def get_historical_kline(
-        self, base_asset: str, quote_asset: str, time: datetime
-    ) -> dict:
+        self, base_asset: str, quote_asset: str, end_time: datetime
+    ) -> Kline:
         symbol = base_asset + quote_asset
 
-        end_time = time.replace(minute=0, second=0, microsecond=0)
         start_timestamp = datetime.timestamp(end_time - timedelta(hours=1))
         end_timestamp = datetime.timestamp(end_time)
 
@@ -86,19 +87,19 @@ class BinanceDataAggregator:
             taker_buy_quote_asset_volume,
             _,
         ] = klines[0]
-        row = {}
-        row["base_asset"] = base_asset
-        row["quote_asset"] = quote_asset
-        row["open_time"] = open_time / 1000
-        row["close_time"] = close_time / 1000
-        row["open_price"] = float(open_price)
-        row["high"] = float(high)
-        row["low"] = float(low)
-        row["close_price"] = float(close_price)
-        row["number_of_trade"] = number_of_trade
-        row["volume"] = float(volume)
-        row["quote_asset_volume"] = float(quote_asset_volume)
-        row["taker_buy_base_asset_volume"] = float(taker_buy_base_asset_volume)
-        row["taker_buy_quote_asset_volume"] = float(taker_buy_quote_asset_volume)
 
-        return row
+        return Kline(
+            base_asset=base_asset,
+            quote_asset=quote_asset,
+            open_time=open_time / 1000,
+            close_time=close_time / 1000,
+            open_price=float(open_price),
+            high=float(high),
+            low=float(low),
+            close_price=float(close_price),
+            number_of_trade=number_of_trade,
+            volume=float(volume),
+            quote_asset_volume=float(quote_asset_volume),
+            taker_buy_base_asset_volume=float(taker_buy_base_asset_volume),
+            taker_buy_quote_asset_volume=float(taker_buy_quote_asset_volume),
+        )

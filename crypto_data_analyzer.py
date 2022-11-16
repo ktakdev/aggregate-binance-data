@@ -1,27 +1,20 @@
 import pandas as pd
 
+from data import Kline
+
 
 class CryptoDataAnalyzer:
-
-    data: list[pd.DataFrame] = []
-    max_stored_data_count = 24
     ranking_count = 10
 
-    def add_hourly_data(self, rows: list[list]):
-        df = pd.DataFrame(rows)
-        df.set_index(keys=["base_asset", "quote_asset"])
-        self.data.insert(0, df)
-        if len(self.data) > self.max_stored_data_count:
-            self.data.pop()
-
-    def analyze(self):
-        if len(self.data) <= 1:
+    def analyze(self, klines: list[list[Kline]]):
+        if len(klines) <= 1:
             return
 
-        latest = self.data[0]
-        previous = self.data[1]
+        latest = pd.DataFrame([row.to_dict() for row in klines[0]])
+        previous = pd.DataFrame([row.to_dict() for row in klines[1]])
 
         df = latest.join(previous, rsuffix="_prev")
+
         open_time = df.open_time.iloc[0]
 
         df["price_change"] = df.close_price - df.close_price_prev
