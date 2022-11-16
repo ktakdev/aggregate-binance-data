@@ -28,7 +28,11 @@ class BinanceDataAggregator:
         dict = {}
         for s in symbols:
             status = s["status"]
-            if status != "TRADING":
+            if (
+                status != "TRADING"
+                or s["baseAsset"].endswith("DOWN")
+                or s["baseAsset"].endswith("UP")
+            ):
                 continue
 
             base_asset = s["baseAsset"]
