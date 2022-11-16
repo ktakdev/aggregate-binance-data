@@ -20,7 +20,7 @@ bq = bigquery.Client()
 binance = Client(api_key=Config.binance_api_key, api_secret=Config.binance_api_secret)
 aggregator = BinanceDataAggregator(binance)
 analyzer = CryptoDataAnalyzer()
-notifier = DiscordNotifier(webhook_urk=Config.discord_webhook_url)
+notifier = DiscordNotifier(webhook_url=Config.discord_webhook_url)
 
 
 def execute(request, context):
