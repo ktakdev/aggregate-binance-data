@@ -14,7 +14,7 @@ class CryptoDataAnalyzer:
         if len(self.data) > self.max_stored_data_count:
             self.data.pop()
 
-    def analyze(self, rows: list[list]):
+    def analyze(self):
         if len(self.data) <= 1:
             return
 
@@ -22,6 +22,8 @@ class CryptoDataAnalyzer:
         previous = self.data[1]
 
         df = latest.join(previous, rsuffix="_prev")
+        open_time = df.open_time.iloc[0]
+
         df["price_change"] = df.close_price - df.close_price_prev
         df["price_change_rate"] = df.price_change / df.close_price_prev
         df["volume_change"] = df.quote_asset_volume - df.quote_asset_volume_prev
@@ -48,7 +50,11 @@ class CryptoDataAnalyzer:
         price_up_ratio = price_up_asset_count / asset_count
         volume_up_ratio = volume_up_asset_count / asset_count
 
-        btc_data = df_usdt[df_usdt.base_asset == "BTC"]
+        btc_data = df_usdt[df_usdt.base_asset == "BTC"].values.tolist()
+        if len(btc_data) > 0:
+            btc_data = btc_data[0]
+        else:
+            btc_data = None
 
         gainers = df_usdt.sort_values(by="price_change_rate", ascending=False).head(
             self.ranking_count
@@ -67,10 +73,11 @@ class CryptoDataAnalyzer:
         btc_losers = df_btc.sort_values(by="price_change_rate").head(self.ranking_count)
 
         return {
+            "open_time": open_time,
             "total_asset_count": asset_count,
             "price_up_ratio": price_up_ratio,
             "volume_up_ratio": volume_up_ratio,
-            "btc_data": btc_data.values.tolist(),
+            "btc_data": btc_data,
             "gainers": gainers.values.tolist(),
             "losers": losers.values.tolist(),
             "gainers_volume": gainers_volume.values.tolist(),

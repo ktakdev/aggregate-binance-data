@@ -30,4 +30,4 @@ jobs:
           event_trigger_type: providers/cloud.pubsub/eventTypes/topic.publish
           event_trigger_resource: projects/${{ secrets.GCP_PROJECT }}/topics/aggregate-crypto-data
           env_vars: "BIGQUERY_OUTPUT_TABLE=${{ env.OUTPUT_TABLE }}"
-          secret_environment_variables: "BINANCE_API_KEY=projects/${{ secrets.GCP_PROJECT }}/secrets/binance-api-key,BINANCE_API_SECRET=projects/${{ secrets.GCP_PROJECT }}/secrets/binance-api-secret"
+          secret_environment_variables: "BINANCE_API_KEY=projects/${{ secrets.GCP_PROJECT }}/secrets/binance-api-key,BINANCE_API_SECRET=projects/${{ secrets.GCP_PROJECT }}/secrets/binance-api-secret,DISCORD_WEBHOOK_URL=projects/${{ secrets.GCP_PROJECT }}/secrets/discord-webhook-url"
