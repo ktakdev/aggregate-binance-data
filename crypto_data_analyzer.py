@@ -68,13 +68,13 @@ class CryptoDataAnalyzer:
         )
 
         btc_gainers = (
-            df_btc[df_btc.quote_asset_volume > 3]
+            df_btc[df_btc.quote_asset_volume > 1]
             .sort_values(by="price_change_rate", ascending=False)
             .head(self.ranking_count)
         )
 
         btc_losers = (
-            df_btc[df_btc.quote_asset_volume > 3]
+            df_btc[df_btc.quote_asset_volume > 1]
             .sort_values(by="price_change_rate")
             .head(self.ranking_count)
         )
