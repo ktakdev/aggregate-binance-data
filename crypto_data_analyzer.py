@@ -9,13 +9,13 @@ class CryptoDataAnalyzer:
     def analyze(self, klines: list[list[Kline]]):
         if len(klines) <= 1:
             return
+        if not klines[0] or not klines[1]:
+            return
 
         latest = pd.DataFrame([row.to_dict() for row in klines[0]])
         previous = pd.DataFrame([row.to_dict() for row in klines[1]])
 
         df = latest.join(previous, rsuffix="_prev")
-
-        open_time = df.open_time.iloc[0]
 
         df["price_change"] = df.close_price - df.close_price_prev
         df["price_change_rate"] = df.price_change / df.close_price_prev
@@ -49,24 +49,37 @@ class CryptoDataAnalyzer:
         else:
             btc_data = None
 
-        gainers = df_usdt.sort_values(by="price_change_rate", ascending=False).head(
-            self.ranking_count
+        gainers = (
+            df_usdt[df_usdt.quote_asset_volume > 2000]
+            .sort_values(by="price_change_rate", ascending=False)
+            .head(self.ranking_count)
         )
 
-        losers = df_usdt.sort_values(by="price_change_rate").head(self.ranking_count)
-
-        gainers_volume = df_usdt.sort_values(
-            by="volume_change_rate", ascending=False
-        ).head(self.ranking_count)
-
-        btc_gainers = df_btc.sort_values(by="price_change_rate", ascending=False).head(
-            self.ranking_count
+        losers = (
+            df_usdt[df_usdt.quote_asset_volume > 2000]
+            .sort_values(by="price_change_rate")
+            .head(self.ranking_count)
         )
 
-        btc_losers = df_btc.sort_values(by="price_change_rate").head(self.ranking_count)
+        gainers_volume = (
+            df_usdt[df_usdt.quote_asset_volume > 2000]
+            .sort_values(by="volume_change_rate", ascending=False)
+            .head(self.ranking_count)
+        )
+
+        btc_gainers = (
+            df_btc[df_btc.quote_asset_volume > 3]
+            .sort_values(by="price_change_rate", ascending=False)
+            .head(self.ranking_count)
+        )
+
+        btc_losers = (
+            df_btc[df_btc.quote_asset_volume > 3]
+            .sort_values(by="price_change_rate")
+            .head(self.ranking_count)
+        )
 
         return {
-            "open_time": open_time,
             "total_asset_count": asset_count,
             "price_up_ratio": price_up_ratio,
             "volume_up_ratio": volume_up_ratio,

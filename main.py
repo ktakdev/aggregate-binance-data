@@ -40,6 +40,6 @@ def execute(request, context):
     stored_klines = store.fetch_klines(dt)
     summary = analyzer.analyze(stored_klines)
     if summary:
-        notifier.notify(summary)
+        notifier.notify(summary, dt - timedelta(hours=1))
 
     return klines

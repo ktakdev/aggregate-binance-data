@@ -9,10 +9,12 @@ class DiscordNotifier:
     def __init__(self, webhook_url: str) -> None:
         self.webhook_url = webhook_url
 
-    def notify(self, summary):
+    def notify(self, summary, start_time: datetime):
         requests.post(
             self.webhook_url,
-            json.dumps({"embeds": self.create_notification_embeds(summary)}),
+            json.dumps(
+                {"embeds": self.create_notification_embeds(summary, start_time)}
+            ),
             headers={"Content-Type": "application/json"},
         )
 
@@ -22,15 +24,14 @@ class DiscordNotifier:
     def format_dollar(self, dollar_price):
         return "$" + "{:,}".format(math.floor(dollar_price))
 
-    def create_notification_embeds(self, summary):
+    def create_notification_embeds(self, summary, start_time: datetime):
         total_asset_count = summary["total_asset_count"]
         price_up_ratio = summary["price_up_ratio"]
         volume_up_ratio = summary["volume_up_ratio"]
         price_up_asset = int(total_asset_count * price_up_ratio)
         volume_up_asset = int(total_asset_count * volume_up_ratio)
 
-        open_time = datetime.fromtimestamp(summary["open_time"])
-        close_time = open_time + timedelta(hours=1)
+        close_time = start_time + timedelta(hours=1)
         btc_data = summary["btc_data"]
 
         gainers = summary["gainers"]
@@ -44,7 +45,7 @@ class DiscordNotifier:
             "fields": [
                 {
                     "name": "集計期間",
-                    "value": open_time.strftime("%m/%d %H:%M")
+                    "value": start_time.strftime("%m/%d %H:%M")
                     + " - "
                     + close_time.strftime("%m/%d %H:%M"),
                 },
