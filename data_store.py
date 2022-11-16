@@ -12,7 +12,9 @@ class KlineStore:
 
     def save_klines(self, klines: list[Kline]) -> list[str] | None:
         table = self.client.get_table(table=self.table)
-        error = self.client.insert_rows(table=table, rows=klines.to_dict())
+        error = self.client.insert_rows(
+            table=table, rows=[kline.to_dict() for kline in klines]
+        )
 
         if error:
             print(error)
