@@ -51,7 +51,8 @@ class DiscordNotifier:
                 {"name": "集計銘柄数", "value": total_asset_count},
                 {
                     "name": "BTC価格",
-                    "value": f"{btc_data[2]} ({self.format_ratio(btc_data[5])})"
+                    "value": f"{btc_data[2]} ({self.format_ratio(btc_data[5])})\n"
+                    + "[チャートを見る](https://www.binance.com/en/trade/BTC_USDT)"
                     if btc_data
                     else "None",
                 },
