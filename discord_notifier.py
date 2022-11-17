@@ -30,6 +30,8 @@ class DiscordNotifier:
         volume_up_ratio = summary["volume_up_ratio"]
         price_up_asset = int(total_asset_count * price_up_ratio)
         volume_up_asset = int(total_asset_count * volume_up_ratio)
+        total_volume = summary["total_volume"]
+        total_volume_change_rate = summary["total_volume_change_rate"]
 
         close_time = start_time + timedelta(hours=1)
         btc_data = summary["btc_data"]
@@ -51,17 +53,26 @@ class DiscordNotifier:
                 },
                 {"name": "集計銘柄数", "value": total_asset_count},
                 {
+                    "name": "出来高合計",
+                    "value": self.format_dollar(total_volume)
+                    + "("
+                    + self.format_ratio(total_volume_change_rate)
+                    + ")",
+                },
+                {
                     "name": "BTC価格",
-                    "value": f"{btc_data[2]} ({self.format_ratio(btc_data[5])})\n"
-                    + "[チャートを見る](https://www.binance.com/en/trade/BTC_USDT)"
+                    "value": self.format_dollar(btc_data["price"])
+                    + "("
+                    + self.format_ratio(btc_data["price_change_ratio"])
+                    + ")"
                     if btc_data
                     else "None",
                 },
                 {
                     "name": "BTC出来高",
-                    "value": self.format_dollar(btc_data[3])
+                    "value": self.format_dollar(btc_data["volume"])
                     + "("
-                    + self.format_ratio(btc_data[7])
+                    + self.format_ratio(btc_data["volume_change_ratio"])
                     + ")"
                     if btc_data
                     else "None",

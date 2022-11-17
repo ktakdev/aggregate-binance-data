@@ -21,12 +21,14 @@ class CryptoDataAnalyzer:
         df["price_change_rate"] = df.price_change / df.close_price_prev
         df["volume_change"] = df.quote_asset_volume - df.quote_asset_volume_prev
         df["volume_change_rate"] = df.volume_change / df.quote_asset_volume_prev
+
         df = df[
             [
                 "base_asset",
                 "quote_asset",
                 "close_price",
                 "quote_asset_volume",
+                "quote_asset_volume_prev",
                 "price_change",
                 "price_change_rate",
                 "volume_change",
@@ -42,6 +44,11 @@ class CryptoDataAnalyzer:
         volume_up_asset_count = len(df_usdt[df_usdt.volume_change_rate > 0].index)
         price_up_ratio = price_up_asset_count / asset_count
         volume_up_ratio = volume_up_asset_count / asset_count
+        total_volume = int(df_usdt.quote_asset_volume.sum())
+        total_volume_prev = int(df_usdt.quote_asset_volume_prev.sum())
+        total_volume_change_rate = (
+            total_volume - total_volume_prev
+        ) / total_volume_prev
 
         btc_data = df_usdt[df_usdt.base_asset == "BTC"].values.tolist()
         if len(btc_data) > 0:
@@ -81,9 +88,18 @@ class CryptoDataAnalyzer:
 
         return {
             "total_asset_count": asset_count,
+            "total_volume": total_volume,
+            "total_volume_change_rate": total_volume_change_rate,
             "price_up_ratio": price_up_ratio,
             "volume_up_ratio": volume_up_ratio,
-            "btc_data": btc_data,
+            "btc_data": {
+                "price": btc_data[2],
+                "volume": btc_data[3],
+                "price_change_ratio": btc_data[6],
+                "volume_change_ratio": btc_data[8],
+            }
+            if btc_data
+            else None,
             "gainers": gainers.values.tolist(),
             "losers": losers.values.tolist(),
             "gainers_volume": gainers_volume.values.tolist(),
