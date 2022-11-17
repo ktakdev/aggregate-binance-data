@@ -57,31 +57,31 @@ class CryptoDataAnalyzer:
             btc_data = None
 
         gainers = (
-            df_usdt[df_usdt.quote_asset_volume > 2000]
+            df_usdt[df_usdt.quote_asset_volume > 3000]
             .sort_values(by="price_change_rate", ascending=False)
             .head(self.ranking_count)
         )
 
         losers = (
-            df_usdt[df_usdt.quote_asset_volume > 2000]
+            df_usdt[df_usdt.quote_asset_volume > 3000]
             .sort_values(by="price_change_rate")
             .head(self.ranking_count)
         )
 
         gainers_volume = (
-            df_usdt[df_usdt.quote_asset_volume > 2000]
+            df_usdt[df_usdt.quote_asset_volume > 3000]
             .sort_values(by="volume_change_rate", ascending=False)
             .head(self.ranking_count)
         )
 
         btc_gainers = (
-            df_btc[df_btc.quote_asset_volume > 1]
+            df_btc[df_btc.quote_asset_volume > 3]
             .sort_values(by="price_change_rate", ascending=False)
             .head(self.ranking_count)
         )
 
         btc_losers = (
-            df_btc[df_btc.quote_asset_volume > 1]
+            df_btc[df_btc.quote_asset_volume > 3]
             .sort_values(by="price_change_rate")
             .head(self.ranking_count)
         )
