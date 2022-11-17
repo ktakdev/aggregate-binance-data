@@ -86,6 +86,8 @@ class CryptoDataAnalyzer:
             .head(self.ranking_count)
         )
 
+        print(btc_data)
+
         return {
             "total_asset_count": asset_count,
             "total_volume": total_volume,

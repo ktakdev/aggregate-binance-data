@@ -95,7 +95,7 @@ class DiscordNotifier:
             "fields": [
                 {
                     "name": row[0],
-                    "value": self.format_ratio(row[5])
+                    "value": self.format_ratio(row[6])
                     + f" (${row[2]})\n"
                     + f"[チャートを見る](https://www.binance.com/en/trade/{row[0]}_{row[1]})",
                 }
@@ -108,7 +108,7 @@ class DiscordNotifier:
             "fields": [
                 {
                     "name": row[0],
-                    "value": self.format_ratio(row[5])
+                    "value": self.format_ratio(row[6])
                     + f" ({row[2]} BTC)\n"
                     + f"[チャートを見る](https://www.binance.com/en/trade/{row[0]}_{row[1]})",
                 }
@@ -121,7 +121,7 @@ class DiscordNotifier:
             "fields": [
                 {
                     "name": row[0],
-                    "value": self.format_ratio(row[7])
+                    "value": self.format_ratio(row[8])
                     + f" ({self.format_dollar(row[3])})\n"
                     + f"[チャートを見る](https://www.binance.com/en/trade/{row[0]}_{row[1]})",
                 }
@@ -134,7 +134,7 @@ class DiscordNotifier:
             "fields": [
                 {
                     "name": row[0],
-                    "value": self.format_ratio(row[5])
+                    "value": self.format_ratio(row[6])
                     + f" (${row[2]})\n"
                     + f"[チャートを見る](https://www.binance.com/en/trade/{row[0]}_{row[1]})",
                 }
@@ -147,7 +147,7 @@ class DiscordNotifier:
             "fields": [
                 {
                     "name": row[0],
-                    "value": self.format_ratio(row[5])
+                    "value": self.format_ratio(row[6])
                     + f" ({row[2]} BTC)\n"
                     + f"[チャートを見る](https://www.binance.com/en/trade/{row[0]}_{row[1]})",
                 }
