@@ -4,10 +4,10 @@ from datetime import datetime, timedelta, timezone
 from binance import Client
 from google.cloud import bigquery
 
-from binance_data_aggregator import BinanceDataAggregator
-from crypto_data_analyzer import CryptoDataAnalyzer
-from data_store import KlineStore
-from discord_notifier import DiscordNotifier
+from libs.binance_data_aggregator import BinanceDataAggregator
+from libs.crypto_data_analyzer import CryptoDataAnalyzer
+from libs.data_store import KlineStore
+from libs.discord_notifier import DiscordNotifier
 
 
 class Config:

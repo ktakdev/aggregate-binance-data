@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 from google.cloud import bigquery
 
-from data import Kline
+from libs.data import Kline
 
 
 class KlineStore:

@@ -1,6 +1,6 @@
 import pandas as pd
 
-from data import Kline
+from libs.data import Kline
 
 
 class CryptoDataAnalyzer:

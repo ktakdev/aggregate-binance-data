@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 from binance import Client
 
-from data import Kline
+from libs.data import Kline
 
 
 class BinanceDataAggregator:
