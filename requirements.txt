@@ -26,6 +26,7 @@ multidict==6.0.2
 numpy==1.23.4
 packaging==21.3
 pandas==1.5.1
+pandas-ta==0.3.14b0
 platformdirs==2.5.2
 proto-plus==1.22.1
 protobuf==4.21.9
@@ -43,7 +44,6 @@ regex==2022.3.2
 requests==2.28.1
 rsa==4.9
 six==1.16.0
-TA-Lib==0.4.26
 tomli==2.0.1
 tzdata==2022.6
 tzlocal==4.2

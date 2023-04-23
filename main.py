@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 
 import numpy as np
 import pandas as pd
-import talib
+import pandas_ta as ta
 from binance import Client
 from google.cloud import bigquery
 
@@ -65,17 +65,21 @@ def aggregate(watchlist, start_timestamp, end_timestamp, date):
         df = pd.DataFrame(klines, columns=columns)
 
         price = df.close.tail(1).values[0]
-        price_sma_7days = talib.SMA(df.close, 7).tail(1).values[0]
-        price_sma_25days = talib.SMA(df.close, 25).tail(1).values[0]
-        price_sma_99days = talib.SMA(df.close, 99).tail(1).values[0]
+        count = len(df)
+        price_sma_7days = ta.sma(df.close, length=7, fillna=True).tail(
+            1).values[0] if count >= 7 else None
+        price_sma_25days = ta.sma(df.close, length=25, fillna=True).tail(
+            1).values[0] if count >= 25 else None
+        price_sma_99days = ta.sma(df.close, length=99, fillna=True).tail(
+            1).values[0] if count >= 99 else None
 
         volume = float(df.quote_asset_volume.tail(1).values[0])
-        volume_sma_7days = talib.SMA(
-            df.quote_asset_volume, 7).tail(1).values[0]
-        volume_sma_25days = talib.SMA(
-            df.quote_asset_volume, 25).tail(1).values[0]
-        volume_sma_99days = talib.SMA(
-            df.quote_asset_volume, 99).tail(1).values[0]
+        volume_sma_7days = ta.sma(df.quote_asset_volume, length=7).tail(
+            1).values[0] if count >= 7 else None
+        volume_sma_25days = ta.sma(df.quote_asset_volume, length=25).tail(
+            1).values[0] if count >= 25 else None
+        volume_sma_99days = ta.sma(df.quote_asset_volume, length=99).tail(
+            1).values[0] if count >= 99 else None
 
         taker_buy_volume = float(
             df.taker_buy_quote_asset_volume.tail(1).values[0])
@@ -197,3 +201,6 @@ def execute(request, context):
     print("Save summary")
     summary_job.result()
     print("Summary have been saved!")
+
+
+execute(None, None)
