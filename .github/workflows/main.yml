@@ -24,8 +24,8 @@ jobs:
         with:
           name: aggregate-binance-data
           description: aggregate price data from binance
-          region: asia-east1
-          vpc_connector: asia-east-vpc-connector
+          region: europe-central2
+          vpc_connector: vpceuropeconnector
           entry_point: execute
           runtime: python310
           memory_mb: 2048
