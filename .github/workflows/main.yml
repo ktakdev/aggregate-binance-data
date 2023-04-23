@@ -20,11 +20,12 @@ jobs:
           project_id: ${{ secrets.GCP_PROJECT }}
           credentials_json: "${{ secrets.GCP_CREDENTIALS }}"
       - name: Deploy Cloud Functions
-        uses: google-github-actions/deploy-cloud-functions@v0
+        uses: google-github-actions/deploy-cloud-functions@v1
         with:
           name: aggregate-binance-data
           description: aggregate price data from binance
-          region: europe-central2
+          region: asia-east1
+          vpc_connector: asia-east-vpc-connector
           entry_point: execute
           runtime: python310
           memory_mb: 2048
