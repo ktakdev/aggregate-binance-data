@@ -6,7 +6,8 @@ on:
       - main
 
 env:
-  OUTPUT_TABLE: binance.historical_klines
+  KLINE_TABLE: binance.daily_klines
+  SUMMARY_TABLE: binance.daily_summary
 
 jobs:
   build:
@@ -30,5 +31,5 @@ jobs:
           timeout: 540
           event_trigger_type: providers/cloud.pubsub/eventTypes/topic.publish
           event_trigger_resource: projects/${{ secrets.GCP_PROJECT }}/topics/aggregate-crypto-data
-          env_vars: "BIGQUERY_OUTPUT_TABLE=${{ env.OUTPUT_TABLE }}"
-          secret_environment_variables: "BINANCE_API_KEY=projects/${{ secrets.GCP_PROJECT }}/secrets/binance-api-key,BINANCE_API_SECRET=projects/${{ secrets.GCP_PROJECT }}/secrets/binance-api-secret,DISCORD_WEBHOOK_URL=projects/${{ secrets.GCP_PROJECT }}/secrets/discord-webhook-url"
+          env_vars: "BIGQUERY_KLINE_TABLE=${{ env.KLINE_TABLE }}, BIGQUERY_SUMMARY_TABLE=${{ env.SUMMARY_TABLE }}"
+          secret_environment_variables: "BINANCE_API_KEY=projects/${{ secrets.GCP_PROJECT }}/secrets/binance-api-key,BINANCE_API_SECRET=projects/${{ secrets.GCP_PROJECT }}/secrets/binance-api-secret"
