@@ -26,6 +26,7 @@ jobs:
           description: aggregate price data from binance
           region: europe-central2
           vpc_connector: vpceuropeconnector
+          vpc_connector_egress_settings: ALL_TRAFFIC
           entry_point: execute
           runtime: python310
           memory_mb: 2048
