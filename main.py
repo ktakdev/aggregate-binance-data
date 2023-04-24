@@ -18,7 +18,7 @@ class Config:
 binance = Client(api_key=Config.binance_api_key, api_secret=Config.binance_api_secret)
 
 
-def fetch_watchlist(quote):
+def fetch_watchlist():
     dict = {}
     res = binance.get_exchange_info()
     symbols = res["symbols"]
@@ -38,11 +38,12 @@ def fetch_watchlist(quote):
 
         dict[base_asset].append(quote_asset)
 
-    result = []
+    result = [("BTC", "USDT")]
     for base_asset in dict:
         avaiable_quote_assets = dict[base_asset]
         if "BTC" in avaiable_quote_assets and "USDT" in avaiable_quote_assets:
-            result.append((base_asset, quote))
+            result.append((base_asset, "USDT"))
+            result.append((base_asset, "BTC"))
 
     return result
 
@@ -51,6 +52,7 @@ def aggregate(watchlist, start_timestamp, end_timestamp, date):
     result = []
     for (base_asset, quote_asset) in watchlist:
         symbol = base_asset + quote_asset
+        print("fetch info: ", symbol)
         klines = binance.get_historical_klines(
             symbol=symbol,
             interval="1d",
@@ -58,7 +60,6 @@ def aggregate(watchlist, start_timestamp, end_timestamp, date):
             end_str=str(end_timestamp),
             limit=99,
         )
-        print("fetch info: ", symbol)
         columns = ['timestamp', 'open', 'high', 'low', 'close', 'volume', 'end_timestamp',
                    'quote_asset_volume', 'number_of_trades', 'taker_buy_base_asset_volume',
                    'taker_buy_quote_asset_volume', 'ignore']
@@ -121,39 +122,39 @@ def execute(request, context):
     end_timestamp = datetime.timestamp(dt)
     date = datetime.timestamp(dt - timedelta(days=1))
 
-    usdt_watchlist = fetch_watchlist("USDT")
-    btc_watchlist = fetch_watchlist("BTC")
-    df_usdt = aggregate(usdt_watchlist, start_timestamp, end_timestamp, date)
-    df_btc = aggregate(btc_watchlist, start_timestamp, end_timestamp, date)
+    watchlist = fetch_watchlist()
+    df = aggregate(watchlist, start_timestamp, end_timestamp, date)
 
-    df_usdt = df_usdt[df_usdt.is_active]
-    usdt_total_count = len(df_usdt)
-    usdt_total_volume = df_usdt.volume.sum()
-    usdt_total_number_of_trades = df_usdt.number_of_trades.sum()
+    df_usdt = df[df.quote_asset == 'USDT']
+    df_usdt.sort_values(by='volume', ascending=False, inplace=True)
+    df_usdt_active = df_usdt[(df_usdt.is_active) & (df_usdt.base_asset != 'BTC')]
+    df_btc = df[df.quote_asset == 'BTC']
+    df_btc.sort_values(by='volume', ascending=False, inplace=True)
+    df_btc_active = df_btc[df_btc.is_active]
+
+    usdt_total_count = len(df_usdt_active)
+    usdt_total_volume = df_usdt_active.volume.sum()
+    usdt_total_number_of_trades = df_usdt_active.number_of_trades.sum()
     usdt_price_gc_count_7_25 = len(
-        df_usdt[df_usdt.price_sma_7days > df_usdt.price_sma_25days])
+        df_usdt_active[df_usdt_active.price_sma_7days > df_usdt_active.price_sma_25days])
     usdt_price_gc_count_25_99 = len(
-        df_usdt[df_usdt.price_sma_25days > df_usdt.price_sma_99days])
+        df_usdt_active[df_usdt_active.price_sma_25days > df_usdt_active.price_sma_99days])
     usdt_volume_gc_count_7_25 = len(
-        df_usdt[df_usdt.volume_sma_7days > df_usdt.volume_sma_25days])
+        df_usdt_active[df_usdt_active.volume_sma_7days > df_usdt_active.volume_sma_25days])
     usdt_volume_gc_count_25_99 = len(
-        df_usdt[df_usdt.volume_sma_25days > df_usdt.volume_sma_99days])
-    df_usdt['volume_ratio'] = df_usdt.volume / usdt_total_volume
+        df_usdt_active[df_usdt_active.volume_sma_25days > df_usdt_active.volume_sma_99days])
 
-    df_btc = df_btc[df_btc.is_active]
-    df_btc.sort_values(by=['volume'], ascending=False, inplace=True)
-    btc_total_count = len(df_btc)
-    btc_total_volume = df_btc.volume.sum()
-    btc_total_number_of_trades = df_btc.number_of_trades.sum()
+    btc_total_count = len(df_btc_active)
+    btc_total_volume = df_btc_active.volume.sum()
+    btc_total_number_of_trades = df_btc_active.number_of_trades.sum()
     btc_price_gc_count_7_25 = len(
-        df_btc[df_btc.price_sma_7days > df_btc.price_sma_25days])
+        df_btc_active[df_btc_active.price_sma_7days > df_btc_active.price_sma_25days])
     btc_price_gc_count_25_99 = len(
-        df_btc[df_btc.price_sma_25days > df_btc.price_sma_99days])
+        df_btc_active[df_btc_active.price_sma_25days > df_btc_active.price_sma_99days])
     btc_volume_gc_count_7_25 = len(
-        df_btc[df_btc.volume_sma_7days > df_btc.volume_sma_25days])
+        df_btc_active[df_btc_active.volume_sma_7days > df_btc_active.volume_sma_25days])
     btc_volume_gc_count_25_99 = len(
-        df_btc[df_btc.volume_sma_25days > df_btc.volume_sma_99days])
-    df_btc['volume_ratio'] = df_btc.volume / btc_total_volume
+        df_btc_active[df_btc_active.volume_sma_25days > df_btc_active.volume_sma_99days])
 
     summary_columns = ['date', 'usdt_total_count', 'usdt_total_volume', 'usdt_total_number_of_trades', 'usdt_price_gc_count_7_25',
                        'usdt_price_gc_count_25_99', 'usdt_volume_gc_count_7_25', 'usdt_volume_gc_count_25_99', 'btc_total_count', 'btc_total_volume', 'btc_total_number_of_trades', 'btc_price_gc_count_7_25',
@@ -200,7 +201,7 @@ def execute(request, context):
 
     print("Save summary")
     summary_job.result()
-    print("Summary have been saved!")
+    print("Summary has been saved!")
 
 
 execute(None, None)
