@@ -169,10 +169,10 @@ def execute(request, context):
 
     summary_columns = [
         'date', 'btc_price', 'btc_volume', 'eth_price', 'eth_volume',
-        'total_count_usdt', 'total_volume_usdt', 'total_number_of_trades_usdt',
+        'total_count', 'total_volume_usdt', 'total_number_of_trades_usdt',
         'price_gc_rate_7_25_usdt', 'price_gc_rate_25_99_usdt',
         'volume_gc_rate_7_25_usdt', 'volume_gc_rate_25_99_usdt',
-        'total_count_btc', 'total_volume_btc', 'total_number_of_trades_btc',
+        'total_volume_btc', 'total_number_of_trades_btc',
         'price_gc_rate_7_25_btc', 'price_gc_rate_25_99_btc',
         'volume_gc_rate_7_25_btc', 'volume_gc_rate_25_99_btc'
     ]
