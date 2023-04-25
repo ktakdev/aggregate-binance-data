@@ -126,55 +126,85 @@ def execute(request, context):
     df = aggregate(watchlist, start_timestamp, end_timestamp, date)
 
     df_usdt = df[df.quote_asset == 'USDT']
-    df_usdt.sort_values(by='volume', ascending=False, inplace=True)
-    df_usdt_active = df_usdt[(df_usdt.is_active) & (df_usdt.base_asset != 'BTC')]
     df_btc = df[df.quote_asset == 'BTC']
-    df_btc.sort_values(by='volume', ascending=False, inplace=True)
+
+    btc_price = df_usdt[df_usdt.base_asset == 'BTC'].price.values[0]
+    btc_volume = df_usdt[df_usdt.base_asset == 'BTC'].volume.values[0]
+    eth_price = df_usdt[df_usdt.base_asset == 'ETH'].price.values[0]
+    eth_volume = df_usdt[df_usdt.base_asset == 'ETH'].volume.values[0]
+
+    total_volume_usdt = df_usdt.volume.sum()
+    total_number_of_trades_usdt = df_usdt.number_of_trades.sum()
+    df.loc[(df.quote_asset == 'USDT') & (df.base_asset == 'BTC'),
+           'volume_ratio'] = None
+    df.loc[(df.quote_asset == 'USDT') & (df.base_asset != 'BTC'),
+           'volume_ratio'] = df_usdt.volume / total_volume_usdt - btc_volume
+
+    df_usdt_active = df_usdt[(df_usdt.is_active) & (df_usdt.base_asset != 'BTC')]
+    total_active_count_usdt = len(df_usdt_active)
+    price_gc_rate_7_25_usdt = len(
+        df_usdt_active[df_usdt_active.price_sma_7days > df_usdt_active.price_sma_25days]) / total_active_count_usdt
+    price_gc_rate_25_99_usdt = len(
+        df_usdt_active[df_usdt_active.price_sma_25days > df_usdt_active.price_sma_99days]) / total_active_count_usdt
+    volume_gc_rate_7_25_usdt = len(
+        df_usdt_active[df_usdt_active.volume_sma_7days > df_usdt_active.volume_sma_25days]) / total_active_count_usdt
+    volume_gc_rate_25_99_usdt = len(
+        df_usdt_active[df_usdt_active.volume_sma_25days > df_usdt_active.volume_sma_99days]) / total_active_count_usdt
+
+    total_count = len(df_btc)
+    total_volume_btc = df_btc.volume.sum()
+    total_number_of_trades_btc = df_btc.number_of_trades.sum()
+    df.loc[df.quote_asset == 'BTC', 'volume_ratio'] = df_btc.volume / total_volume_btc
+
     df_btc_active = df_btc[df_btc.is_active]
+    total_active_count_btc = len(df_btc_active)
+    price_gc_rate_7_25_btc = len(
+        df_btc_active[df_btc_active.price_sma_7days > df_btc_active.price_sma_25days]) / total_active_count_btc
+    price_gc_rate_25_99_btc = len(
+        df_btc_active[df_btc_active.price_sma_25days > df_btc_active.price_sma_99days]) / total_active_count_btc
+    volume_gc_rate_7_25_btc = len(
+        df_btc_active[df_btc_active.volume_sma_7days > df_btc_active.volume_sma_25days]) / total_active_count_btc
+    volume_gc_rate_25_99_btc = len(
+        df_btc_active[df_btc_active.volume_sma_25days > df_btc_active.volume_sma_99days]) / total_active_count_btc
 
-    usdt_total_count = len(df_usdt_active)
-    usdt_total_volume = df_usdt_active.volume.sum()
-    usdt_total_number_of_trades = df_usdt_active.number_of_trades.sum()
-    usdt_price_gc_count_7_25 = len(
-        df_usdt_active[df_usdt_active.price_sma_7days > df_usdt_active.price_sma_25days])
-    usdt_price_gc_count_25_99 = len(
-        df_usdt_active[df_usdt_active.price_sma_25days > df_usdt_active.price_sma_99days])
-    usdt_volume_gc_count_7_25 = len(
-        df_usdt_active[df_usdt_active.volume_sma_7days > df_usdt_active.volume_sma_25days])
-    usdt_volume_gc_count_25_99 = len(
-        df_usdt_active[df_usdt_active.volume_sma_25days > df_usdt_active.volume_sma_99days])
+    summary_columns = [
+        'date', 'btc_price', 'btc_volume', 'eth_price', 'eth_volume',
+        'total_count_usdt', 'total_volume_usdt', 'total_number_of_trades_usdt',
+        'price_gc_rate_7_25_usdt', 'price_gc_rate_25_99_usdt',
+        'volume_gc_rate_7_25_usdt', 'volume_gc_rate_25_99_usdt',
+        'total_count_btc', 'total_volume_btc', 'total_number_of_trades_btc',
+        'price_gc_rate_7_25_btc', 'price_gc_rate_25_99_btc',
+        'volume_gc_rate_7_25_btc', 'volume_gc_rate_25_99_btc'
+    ]
+    summary_df = pd.DataFrame([
+        (date, btc_price, btc_volume, eth_price, eth_volume,
+         total_count, total_volume_usdt, total_number_of_trades_usdt,
+         price_gc_rate_7_25_usdt, price_gc_rate_25_99_usdt,
+         volume_gc_rate_7_25_usdt, volume_gc_rate_25_99_usdt,
+         total_volume_btc, total_number_of_trades_btc,
+         price_gc_rate_7_25_btc, price_gc_rate_25_99_btc,
+         volume_gc_rate_7_25_btc, volume_gc_rate_25_99_btc
+         )], columns=summary_columns)
 
-    btc_total_count = len(df_btc_active)
-    btc_total_volume = df_btc_active.volume.sum()
-    btc_total_number_of_trades = df_btc_active.number_of_trades.sum()
-    btc_price_gc_count_7_25 = len(
-        df_btc_active[df_btc_active.price_sma_7days > df_btc_active.price_sma_25days])
-    btc_price_gc_count_25_99 = len(
-        df_btc_active[df_btc_active.price_sma_25days > df_btc_active.price_sma_99days])
-    btc_volume_gc_count_7_25 = len(
-        df_btc_active[df_btc_active.volume_sma_7days > df_btc_active.volume_sma_25days])
-    btc_volume_gc_count_25_99 = len(
-        df_btc_active[df_btc_active.volume_sma_25days > df_btc_active.volume_sma_99days])
-
-    summary_columns = ['date', 'usdt_total_count', 'usdt_total_volume', 'usdt_total_number_of_trades', 'usdt_price_gc_count_7_25',
-                       'usdt_price_gc_count_25_99', 'usdt_volume_gc_count_7_25', 'usdt_volume_gc_count_25_99', 'btc_total_count', 'btc_total_volume', 'btc_total_number_of_trades', 'btc_price_gc_count_7_25',
-                       'btc_price_gc_count_25_99', 'btc_volume_gc_count_7_25', 'btc_volume_gc_count_25_99']
-    summary_df = pd.DataFrame([(date, usdt_total_count, usdt_total_volume, usdt_total_number_of_trades, usdt_price_gc_count_7_25, usdt_price_gc_count_25_99,
-                              usdt_volume_gc_count_7_25, usdt_volume_gc_count_25_99, btc_total_count, btc_total_volume, btc_total_number_of_trades, btc_price_gc_count_7_25, btc_price_gc_count_25_99, btc_volume_gc_count_7_25, btc_volume_gc_count_25_99)], columns=summary_columns)
     summary_df = summary_df.astype({
         'date': 'datetime64[s]',
-        'usdt_total_count': 'int',
-        'usdt_total_volume': 'float64',
-        'usdt_price_gc_count_7_25': 'int',
-        'usdt_price_gc_count_25_99': 'int',
-        'usdt_volume_gc_count_7_25': 'int',
-        'usdt_volume_gc_count_25_99': 'int',
-        'btc_total_count': 'int',
-        'btc_total_volume': 'float64',
-        'btc_price_gc_count_7_25': 'int',
-        'btc_price_gc_count_25_99': 'int',
-        'btc_volume_gc_count_7_25': 'int',
-        'btc_volume_gc_count_25_99': 'int'
+        'btc_price': 'float64',
+        'btc_volume': 'float64',
+        'eth_price': 'float64',
+        'eth_volume': 'float64',
+        'total_count': 'int',
+        'total_volume_usdt': 'float64',
+        'total_number_of_trades_usdt': 'int',
+        'price_gc_rate_7_25_usdt': 'float64',
+        'price_gc_rate_25_99_usdt': 'float64',
+        'volume_gc_rate_7_25_usdt': 'float64',
+        'volume_gc_rate_25_99_usdt': 'float64',
+        'total_volume_btc': 'float64',
+        'total_number_of_trades_btc': 'int',
+        'price_gc_rate_7_25_btc': 'float64',
+        'price_gc_rate_25_99_btc': 'float64',
+        'volume_gc_rate_7_25_btc': 'float64',
+        'volume_gc_rate_25_99_btc': 'float64'
     })
 
     client = bigquery.Client()
@@ -202,6 +232,3 @@ def execute(request, context):
     print("Save summary")
     summary_job.result()
     print("Summary has been saved!")
-
-
-execute(None, None)
